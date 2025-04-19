@@ -71,7 +71,12 @@ console.log("removing file", file);
 
     const handleUploadFiles = async () => {
       console.log("uploading files to server", uploadFiles);
-        const resp = await getTempUrl(uploadFiles.map((file) => file.name));
+        const resp = await getTempUrl(uploadFiles.map((file) => {
+         return { 
+          name: file.name,
+          imgType: file.type,
+         }
+        }));
         
         console.log("temp upload urls", resp);
         await imageUploadS3({imgfiles: uploadFiles, tempurls: resp});

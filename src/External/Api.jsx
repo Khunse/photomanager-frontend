@@ -232,6 +232,7 @@ export const useDeleteImages = () =>{
 
     const deleteImage = async (imgNames) => {
         try {
+            console.log('delete body ',imgNames);
             const resp = await globalFetch(`${baseUrl}/images/delete`,'POST',{}, {Req: {
                 Description : "test",
                 imageUrls : imgNames

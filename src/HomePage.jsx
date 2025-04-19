@@ -73,7 +73,7 @@ console.log('image data list ::: ', imageDataList);
 
     const handleDeleteImage = async () => {
       console.log('delete image', selectedImage);
-      const resp = await deleteImages(selectedImage);
+      const resp = await deleteImages(selectedImage.map((item) => ( {name:item} )));
       setSelectedImage([]);
       console.log('delete image resp', resp);
       getImageRefetch();
