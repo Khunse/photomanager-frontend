@@ -1,6 +1,6 @@
 import { AspectRatio } from '@radix-ui/react-aspect-ratio'
 import React from 'react'
-import { Checkbox } from './components/ui/checkbox'
+import { Checkbox } from '../ui/checkbox'
 
 export default function ImageItem({imgUrl,imgName,date,meta,isSelected,handleSelectImage}) {
 

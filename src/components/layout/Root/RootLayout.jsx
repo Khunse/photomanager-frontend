@@ -1,4 +1,4 @@
-import AppSideBar from '@/AppSideBar'
+import {AppSideBar} from 'components/layout/Root'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import React from 'react'

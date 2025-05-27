@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
-import { Card, CardContent, CardFooter, CardHeader } from './components/ui/card'
-import { Button } from './components/ui/button'
-import { Input } from './components/ui/input'
+import { Card, CardContent, CardFooter, CardHeader } from 'components/ui/card'
+import { Button } from 'components/ui/button'
+import { Input } from 'components/ui/input'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Form,FormMessage,FormItem,FormField,FormLabel,FormControl } from './components/ui/form'
-import { Checkbox } from './components/ui/checkbox'
+import { Form,FormMessage,FormItem,FormField,FormLabel,FormControl } from 'components/ui/form'
+import { Checkbox } from 'components/ui/checkbox'
 import { Link } from 'react-router'
-import { useSignupUser } from './External/Api'
+import { useSignupUser } from '@/common/External/Api'
 
 export default function SignupForm() {
 

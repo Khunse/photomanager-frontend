@@ -1,4 +1,4 @@
-import { useGetCurrentUser } from '@/External/Api';
+import { useGetCurrentUser } from '@/common/External/Api';
 import React, { createContext, useContext,useState, useEffect } from 'react'
 import { useNavigate } from 'react-router';
 
@@ -53,8 +53,15 @@ useEffect(() => {
 
     const token =  localStorage.getItem('token');
     console.log('token ;;; ', token);
+
+    const searchbar = window.location.search;
+    const params = new URLSearchParams(searchbar);
+    const code = params.get('code');
+
+    console.log('return code :: ',code);
+
     if(!token){
-        navigate('/login');
+        // navigate('/login');
     }
 
     CheckUserAuth();

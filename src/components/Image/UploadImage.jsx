@@ -1,19 +1,38 @@
-import React, { useState } from 'react'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './components/ui/card'
-import { Button } from './components/ui/button'
+import React, { useEffect, useState } from 'react'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card'
+import { Button } from '../ui/button'
 import ImageUploadFile from './ImageUplodFile'
 import { toast } from 'sonner'
-import { useAuthGuard, useGetImages, useGetTempUploadUrl, useUploadImageFilesToS3 } from './External/Api'
+import { useAuthGuard, useGetImages, useGetTempUploadUrl, useUploadImageFilesToS3 } from '../../common/External/Api'
 
 export default function UploadImage() {
-useAuthGuard();
+// useAuthGuard();
     const inputFileref = React.useRef(null)
 const allowfiletypes = ['image/jpeg', 'image/jpg', 'image/png']
 const [uploadFiles, setUploadFiles] = React.useState([])
 
-const {mutateAsync: getTempUrl,data: tempUploadUrls} = useGetTempUploadUrl()
-const {mutateAsync: imageUploadS3} = useUploadImageFilesToS3();
-const {refetch:getImagerefetch} = useGetImages();
+const {mutateAsync: getTempUrl,data: tempUploadUrls,isError: tempurlerror} = useGetTempUploadUrl()
+const {mutateAsync: imageUploadS3,isError: uploaderror} = useUploadImageFilesToS3();
+// const {refetch:getImagerefetch, isError: imagelisterror} = useGetImages();
+
+
+useEffect(() => {
+
+    if(tempurlerror) {
+        console.error("Error fetching temporary upload URLs:", tempurlerror);
+        toast.error("Failed to get temporary upload URLs. Please try again.");
+    }
+    if(uploaderror) {
+        console.error("Error uploading images to S3:", uploaderror);
+        toast.error("Failed to upload images. Please try again.");
+    }
+    // if(imagelisterror) {
+    //     console.error("Error fetching image list:", imagelisterror);
+    //     toast.error("Failed to fetch image list. Please try again.");
+    // }
+
+},[tempurlerror, uploaderror]);
+
     const handleChange = async (e) => {
         
         e.preventDefault();
@@ -80,7 +99,7 @@ console.log("removing file", file);
         
         console.log("temp upload urls", resp);
         await imageUploadS3({imgfiles: uploadFiles, tempurls: resp});
-        getImagerefetch();
+        // getImagerefetch();
     };
 
     console.log("file urel",uploadFiles.length > 0 && URL.createObjectURL(uploadFiles[0]));

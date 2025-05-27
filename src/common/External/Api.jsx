@@ -1,9 +1,10 @@
 
-import { useAuthContext } from '@/context/AuthContext';
+import { useAuthContext } from '@/common/context/AuthContext';
 import { Description } from '@radix-ui/react-dialog';
 import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
+import { AuthRequiredError, ServerError } from './exception';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -40,8 +41,16 @@ export  const  useGetCurrentUser = () => {
 export const useLoginUser = ()=>{
 
 
-   const userLogin = async ({email,password}) => {
-    const resp = await globalFetch(`${baseUrl}/login`,'POST',{}, {Email: email, Password: password});
+   const userLogin = async ({email,password,code='',providerid=0}) => {
+
+    const loginReq = {
+        Email: email,
+        Password: password,
+        Code: code,
+        ProviderId: providerid
+    };
+
+    const resp = await globalFetch(`${baseUrl}/login`,'POST',{}, loginReq);
     console.log('resp from login :::: ', resp);
 
     if(resp.isSuccess)
@@ -151,9 +160,9 @@ console.log("url :::: ", url);
     return result;
 }
 
-export const globalFetch = async (url, method, header={},body={},handleUnauthorized) => {
+export const globalFetch = async (url, method, header={},body={}) => {
 
-    try {
+
         const resp = await fetch(url, {
             method: method,
             body: JSON.stringify(body),
@@ -163,22 +172,35 @@ export const globalFetch = async (url, method, header={},body={},handleUnauthori
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 ...header
             },
-        })
-resp.body.getReader
+        });
+
         if(!resp.ok)
         {
-            console.log("Error in response", resp.statusText);
-            if(resp.status === 401 ) handleUnauthorized();
-            return null;
+             const errorbody = resp.statusText;
+            console.log('error body from api call backend ::  ', errorbody);
+            switch(resp.status) {
+
+                case 401:
+                    throw new AuthRequiredError(errorbody);
+                case 500:
+                    throw new ServerError(errorbody);
+                default:
+                    //  console.log("Error in response", resp.statusText);
+                    // if(resp.status === 401 ) handleUnauthorized();
+            
+                    const error = new Error(errorbody || 'Something went wrong');
+                    error.status = resp.status;
+                    error.body = errorbody;
+                    throw error;
+
+            }
+           
         }
+
         const data = await resp.json();
         console.log('data from api call backend ::  ', data);
         return data;
-    } catch (error) {
-        console.error('Error uploading file:', error)
-        
-        return null;
-    }
+    
 }
 
 export const useAuthGuard = () => {
@@ -197,25 +219,19 @@ export const useAuthGuard = () => {
 
 export const useGetImages = () => {
 
-    const {handleUnauthorized} = useAuthContext();
+    // const {handleUnauthorized} = useAuthContext();
 
     const fetchdata = async()=>{
 
+        
             
-        try {
-            
-            const resp = await globalFetch(`${baseUrl}/images`,'POST',{},{},handleUnauthorized);
+            const resp = await globalFetch(`${baseUrl}/images`,'POST',{},{});
     
             console.log('resp from get current user :::: ', resp);
         
-    
-        return resp;
+            return resp;
 
-     } catch (error) {
-      console.error('Error fetching data:', error);
-      if(resp.status === 401 ) handleUnauthorized();
-      return null;  
-     }
+   
 }
 
 const result = useQuery({

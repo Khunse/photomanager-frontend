@@ -1,6 +1,6 @@
 import React from 'react'
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './components/ui/sidebar'
-
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+             SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from 'components/ui/sidebar'
 import { Home, Inbox, Calendar, Search, Settings } from 'lucide-react'
 import { Link } from 'react-router'
 export default function AppSideBar() {
@@ -13,7 +13,7 @@ export default function AppSideBar() {
     },
     {
       title: "Inbox",
-      url: "#",
+      url: "/inbox",
       icon: Inbox,
     },
     {

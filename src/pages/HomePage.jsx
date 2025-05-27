@@ -1,18 +1,38 @@
-import React, { useState } from 'react'
-import ImageItem from './ImageItem'
-import ImageUploadDialog from './ImageUploadDialog';
-import { useAuthGuard, useDeleteImages, useGetImages, useGetTmpUrlDownloadImage } from './External/Api';
-import { Button } from './components/ui/button';
-import { downloadImageS3 } from './common/filemanagement';
+import React, { useEffect, useState } from 'react'
+import { useAuthGuard, useDeleteImages, useGetImages, useGetTmpUrlDownloadImage } from '../common/External/Api';
+import { Button } from '../components/ui/button';
+import { downloadImageS3 } from '../common/filemanagement';
+import {ImageItem,ImageUploadDialog,} from 'components/Image';
+import { toast } from 'sonner'
+import { useNavigate, useNavigation } from 'react-router';
+
 
 export default function HomePage() {
-useAuthGuard();
-const {data: imageDataList,refetch: getImageRefetch} = useGetImages();
+// useAuthGuard();
+const {data: imageDataList,refetch: getImageRefetch,error,isError} = useGetImages();
 const [selectedImage, setSelectedImage] = useState([]);
 const {mutateAsync: deleteImages} = useDeleteImages();
 const {mutateAsync: getTmpUrlImg} = useGetTmpUrlDownloadImage();
+const navigate = useNavigate();
+
+ useEffect(()=>{
+
+      if(isError) 
+      {
+
+            if(error.statusCode === 401) navigate('/login');
+
+            toast.error(error.name, {
+              duration: 5000,
+              description: error.message,
+            });
+            
+        }    
+    },[error, navigate]);
 
 console.log('image data list ::: ', imageDataList);
+console.log('is serror ::: ', error);
+// Uncomment the below code to use a static image data list for testing
     // const imageDataList = [
     //     {
     //       imgUrl: 'https://picsum.photos/400/300',
@@ -93,10 +113,11 @@ console.log('image data list ::: ', imageDataList);
 
     };
 
+
+
   return (
     <div className=''>
-        {/* <h1>Home Page</h1> */}
-
+ 
         <ImageUploadDialog />
         {
         selectedImage.length > 0 &&
@@ -111,7 +132,7 @@ console.log('image data list ::: ', imageDataList);
         }
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
                 {
-                   imageDataList &&  imageDataList.map((item, index) => (
+                imageDataList &&  imageDataList.map((item, index) => (
                             <ImageItem key={index} imgUrl={item.imageUrl} imgName={item.name} date={'2025-01-02'} meta={{width: 400,height: 300}} handleSelectImage={handleSelectImageP} isSelected={selectedImage.includes(item.name)}/>
                     ))
                 }

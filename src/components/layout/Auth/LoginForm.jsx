@@ -1,15 +1,17 @@
-import React from 'react'
-import { Card, CardContent, CardFooter, CardHeader } from './components/ui/card'
-import { Button } from './components/ui/button'
-import { Input } from './components/ui/input'
+import React, { useEffect } from 'react'
+import { Card, CardContent, CardFooter, CardHeader } from '../../ui/card'
+import { Button } from '../../ui/button'
+import { Input } from '../../ui/input'
 import { set, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Form,FormMessage,FormItem,FormField,FormLabel,FormControl } from './components/ui/form'
-import { Checkbox } from './components/ui/checkbox'
+import { Form,FormMessage,FormItem,FormField,FormLabel,FormControl } from '../../ui/form'
+import { Checkbox } from '../../ui/checkbox'
 import { Link, useNavigate } from 'react-router'
-import { useAuthContext } from './context/AuthContext'
-import { useGetCurrentUser, useLoginUser } from './External/Api'
+import { useAuthContext } from '../../../common/context/AuthContext'
+import { useGetCurrentUser, useLoginUser } from '../../../common/External/Api'
+import { CGoogleLogin } from './SocailLogin'
+import { toast } from 'sonner'
 
 export default function LoginForm() {
 
@@ -26,7 +28,7 @@ export default function LoginForm() {
         password: ''
     });
 
-    const {mutateAsync: loginUserAction} = useLoginUser();
+    const {mutateAsync: loginUserAction,isError,error} = useLoginUser();
     const myform = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -56,6 +58,37 @@ export default function LoginForm() {
         }
         
 
+  }
+
+  useEffect(() => {
+   
+
+    if(isError)
+    {
+      toast(error.name,{
+                         description: error.message,
+                         duration: 3000,
+                       })
+    }
+    else
+    {
+ const searchbar = window.location.search;
+    const params = new URLSearchParams(searchbar);
+    const code = params.get('code');
+
+    console.log('fb return code :: ',code);
+    }
+  },[isError]);
+
+const appid = 1091286722716985;
+const gclient_id = "887087555913-8h2b7v4ik4v5t3016qkm9ljpk6lc9rt2.apps.googleusercontent.com";
+const redirect_uri = "http://localhost:5173/auth/callback";
+  const facebookLogin= () =>{
+    window.location.assign(`https://facebook.com/dialog/oauth?app_id=${appid}&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=email,public_profile`);
+  }
+
+  const googleLogin = () => {
+    window.location.assign(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${gclient_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&prompt=consent+select_account&response_type=code&scope=email%20profile`);
   }
 
   return (
@@ -111,6 +144,9 @@ export default function LoginForm() {
         <CardFooter>
             <div className='w-full grid gap-4'>
             <Button className='w-full'>Login</Button>
+            {/* <CGoogleLogin /> */}
+            <Button onClick={googleLogin}>Google Login</Button>
+            <Button onClick={facebookLogin}>Facebook Login</Button>
             <p>
                 Don't have an account? <Link to='/signup' className="text-blue-500 hover:underline">Sign up</Link>
             </p>
